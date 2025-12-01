@@ -1,3 +1,4 @@
+
 resource "aws_iam_role" "lambda_executor_role" {
   name = "WebsiteUptimeCheckerRole"
 
