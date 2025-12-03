@@ -1,0 +1,11 @@
+{
+  "Comment": "Checks the uptime of a simple URL",
+  "StartAt": "CheckWebsite",
+  "States": {
+    "CheckWebsite": {
+      "Type": "Task",
+      "Resource": "${lambda_arn}",
+      "End": true
+    }
+  }
+}
