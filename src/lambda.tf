@@ -17,4 +17,11 @@ resource "aws_lambda_function" "checker_function" {
   runtime = "python3.9"
   timeout = 15
 
+  # Database name
+  environment {
+    variables = {
+      DYNAMODB_TABLE = aws_dynamodb_table.uptime_results.name
+    }
+  }
+
 }

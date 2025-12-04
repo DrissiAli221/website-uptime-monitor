@@ -123,3 +123,28 @@ resource "aws_iam_role_policy_attachment" "eventbridge_sfn_attachement" {
   role       = aws_iam_role.eventbridge_role.name
   policy_arn = aws_iam_policy.eventbridge_invoke_sfc.arn
 }
+
+
+
+
+# Database Lambda IAM
+resource "aws_iam_policy" "lambda_dynamo_policy" {
+  name        = "LambdaDynamoDBWritePolicy"
+  description = "Allows Lambda to write to DynamoDB"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = "dynamodb:PutItem"
+        #permission to this table alone
+        Resource = aws_dynamodb_table.uptime_results.arn
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "dynamo_lambda_attachment" {
+  role       = aws_iam_role.lambda_executor_role.name
+  policy_arn = aws_iam_policy.lambda_dynamo_policy.arn
+}
