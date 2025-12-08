@@ -14,8 +14,11 @@ resource "aws_sfn_state_machine" "uptime_checker" {
   #   provide the workflow definition 
   #  definition = data.template_file.state_workflow.rendered (deprecated)
   #  new way 
-  definition = templatefile("${path.module}/state_machines/workflow.json", {
-    lambda_arn = aws_lambda_function.checker_function.arn
+  definition = templatefile("${path.module}/state_machines/multi_region_workflow.json", {
+    checker_us_arn = module.us_check.lambda_arn
+    checker_eu_arn = module.eu_check.lambda_arn
+    proxy_arn      = aws_lambda_function.proxy.arn
+    saver_arn      = aws_lambda_function.saver.arn
   })
 
 }

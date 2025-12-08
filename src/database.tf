@@ -9,6 +9,7 @@ resource "aws_dynamodb_table" "uptime_results" {
     name = "Url"
     type = "S"
   }
+  
   attribute {
     name = "Timestamp"
     type = "S"

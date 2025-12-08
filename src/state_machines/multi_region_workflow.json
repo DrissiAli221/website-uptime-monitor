@@ -1,0 +1,49 @@
+{
+  "Comment": "Check website uptime in parallel, then save merged result.",
+  "StartAt": "ParallelChecks",
+  "States": {
+    "ParallelChecks": {
+      "Type": "Parallel",
+      "Next": "SaveResults",
+      "Branches": [
+        {
+          "StartAt": "CheckUS",
+          "States": {
+            "CheckUS": {
+              "Type": "Task",
+              "Resource": "arn:aws:states:::lambda:invoke",
+              "Parameters": {
+                "FunctionName": "${checker_us_arn}",
+                "Payload.$": "$"
+              },
+              "End": true
+            }
+          }
+        },
+        {
+          "StartAt": "CheckEU",
+          "States": {
+            "CheckEU": {
+              "Type": "Task",
+              "Resource": "arn:aws:states:::lambda:invoke",
+              "Parameters": {
+                "FunctionName": "${proxy_arn}",
+                "Payload": {
+                  "target_arn": "${checker_eu_arn}",
+                  "payload.$": "$"
+                }
+              },
+              "End": true
+            }
+          }
+        }
+      ]
+    },
+
+    "SaveResults": {
+      "Type": "Task",
+      "Resource": "${saver_arn}",
+      "End": true
+    }
+  }
+}

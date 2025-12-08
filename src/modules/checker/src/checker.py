@@ -8,10 +8,14 @@ import os
 from datetime import datetime # for timestamp
 
 
-    # Initialize the DynamoDB client 
-dynamo_db = boto3.resource("dynamodb")
+# Initialize the DynamoDB client 
+
+# We will be moving the logic into a saver file 
 TABLE_NAME = os.environ.get("DYNAMODB_TABLE")
-table = dynamo_db.Table(TABLE_NAME)
+DB_REGION = os.environ.get("AWS_REGION")
+
+# dynamo_db = boto3.resource("dynamodb", region_name=DB_REGION)
+# table = dynamo_db.Table(TABLE_NAME)
 
 # This is the entry point for the Lambda function
 # The event object will contain the input from Step Functions.
@@ -39,9 +43,14 @@ def handler(event, context):
     try:
         # Establish connection
         conn = http.client.HTTPSConnection(hostname, timeout=10)
+
+        # disguise as a real browser
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        }
         
         start_time = time.time()
-        conn.request("GET", path)
+        conn.request("GET", path, headers=headers)
         response = conn.getresponse()
         end_time = time.time()
 
@@ -67,6 +76,8 @@ def handler(event, context):
         # Redirects are considered successful
         "Success" : 200 <= status_code < 400,
         "is_redirect" : 300 <= status_code < 400,
+        # variable auto provided by AWS
+        "Region": os.environ.get('AWS_REGION'),
         "Error": error
     }
 
@@ -74,7 +85,7 @@ def handler(event, context):
         item["Error"] = error
             
     try:
-        table.put_item(Item=item)
+        # table.put_item(Item=item)
         print(f"Saved to DB: {item}")
     except Exception as e:
         print(f"DB Write Failed: {str(e)}")
