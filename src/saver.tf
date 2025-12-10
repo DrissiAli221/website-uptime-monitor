@@ -16,6 +16,7 @@ resource "aws_lambda_function" "saver" {
   environment {
     variables = {
       DYNAMODB_TABLE = aws_dynamodb_table.uptime_results.name
+      SNS_TOPIC_ARN  = aws_sns_topic.uptime_alert.arn
     }
   }
 }
@@ -54,6 +55,11 @@ resource "aws_iam_role_policy" "saver_policy" {
           "logs:PutLogEvents"
         ],
         Resource = "*"
+      },
+      {
+        Effect   = "Allow"
+        Action   = ["sns:Publish"]
+        Resource = aws_sns_topic.uptime_alert.arn
       }
     ]
   })
